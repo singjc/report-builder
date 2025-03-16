@@ -1,3 +1,46 @@
+//! # Report Builder
+//!
+//! This crate provides tools for generating HTML reports with interactive elements such as tables,
+//! plots, and other visualizations. It's designed to be used as a library within other Rust projects.
+//!
+//! ## Features
+//!
+//! - Create multi-section reports
+//! - Add interactive tables with sorting, searching, and CSV export
+//! - Include responsive Plotly charts
+//! - Customizable styling and layout
+//!
+//! ## Usage
+//!
+//! Add `report-builder` to your `Cargo.toml` dependencies:
+//!
+//! ```
+//! [dependencies]
+//! report-builder = "0.1.0"  # Replace with the latest version
+//! ```
+//!
+//! Then, use the provided structs and methods to construct your report:
+//!
+//! ```
+//! use report_builder::{Report, ReportSection};
+//! use plotly::Plot;
+//!
+//! fn main() {
+//!     let mut report = Report::new("MySoftware", "1.0", Some("logo.png"), "Analysis Report");
+//!     
+//!     let mut section = ReportSection::new("Results");
+//!     section.add_content(html! { p { "This is a paragraph in the results section." } });
+//!     
+//!     // Add a plot (assuming you have a Plot object)
+//!     let plot = Plot::new(); // Create and customize your plot
+//!     section.add_plot(plot);
+//!     
+//!     report.add_section(section);
+//!     report.save_to_file("report.html").unwrap();
+//! }
+//! ```
+
+
 pub mod plots;
 
 use std::io::Write;
@@ -6,14 +49,19 @@ use chrono::Local;
 use maud::{html, Markup, PreEscaped};
 use plotly::Plot;
 
-/// Struct to represent a section of the report
+
+/// Represents a section of the report, containing a title and multiple content blocks.
 pub struct ReportSection {
     title: String,
     content_blocks: Vec<Markup>, // Multiple content blocks (text or plots)
 }
 
 impl ReportSection {
-    /// Create a new section with a title
+    /// Creates a new section with the given title.
+    ///
+    /// # Arguments
+    ///
+    /// * `title` - A string slice that holds the title of the section.
     pub fn new(title: &str) -> Self {
         ReportSection {
             title: title.to_string(),
@@ -21,12 +69,20 @@ impl ReportSection {
         }
     }
 
-    /// Add a block of content (text, HTML, etc.)
+    /// Adds a block of content (text, HTML, etc.) to the section.
+    ///
+    /// # Arguments
+    ///
+    /// * `content` - A Markup object representing the content to be added.
     pub fn add_content(&mut self, content: Markup) {
         self.content_blocks.push(content);
     }
 
-    /// Add a plot to the section
+    /// Adds a Plotly plot to the section, with responsive sizing.
+    ///
+    /// # Arguments
+    ///
+    /// * `plot` - A Plot object to be added to the section.
     pub fn add_plot(&mut self, plot: Plot) {
         let plot_id: String = rand::thread_rng()
             .sample_iter(&Alphanumeric)
@@ -72,7 +128,7 @@ impl ReportSection {
 
 
 
-/// Struct to represent the entire report
+/// Represents the entire report, containing multiple sections and metadata.
 pub struct Report {
     software_name: String,
     version: String,
@@ -82,7 +138,14 @@ pub struct Report {
 }
 
 impl Report {
-    /// Create a new report with a title
+    /// Creates a new report with the given metadata.
+    ///
+    /// # Arguments
+    ///
+    /// * `software_name` - The name of the software generating the report.
+    /// * `version` - The version of the software.
+    /// * `software_logo` - An optional path to the software's logo image.
+    /// * `title` - The title of the report.
     pub fn new(software_name: &str, version: &str, software_logo: Option<&str>, title: &str) -> Self {
         Report {
             software_name: software_name.to_string(),
@@ -93,7 +156,11 @@ impl Report {
         }
     }
 
-    /// Add a section to the report
+    /// Adds a section to the report.
+    ///
+    /// # Arguments
+    ///
+    /// * `section` - A ReportSection to be added to the report.
     pub fn add_section(&mut self, section: ReportSection) {
         self.sections.push(section);
     }
@@ -318,7 +385,15 @@ impl Report {
     }
     
 
-    /// Save the report to an HTML file
+    /// Saves the report to an HTML file.
+    ///
+    /// # Arguments
+    ///
+    /// * `filename` - The name of the file to save the report to.
+    ///
+    /// # Returns
+    ///
+    /// A Result indicating success or an IO error.
     pub fn save_to_file(&self, filename: &str) -> std::io::Result<()> {
         let mut file = std::fs::File::create(filename)?;
         file.write_all(self.render().into_string().as_bytes())?;
