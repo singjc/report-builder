@@ -7,6 +7,9 @@ rust-version = "1.76"
 description = "A simple html report builder for Rust"
 readme = "README.md"
 license = "MIT"
+repository = "https://github.com/singjc/report-builder.git"
+documentation = "https://docs.rs/report-builder"
+homepage = "https://github.com/singjc/report-builder.git"
 
 [dependencies]
 maud = "0.27.0"
