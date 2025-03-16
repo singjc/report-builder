@@ -14,15 +14,16 @@
 //!
 //! Add `report-builder` to your `Cargo.toml` dependencies:
 //!
-//! ```
+//! ```rust,ignore
 //! [dependencies]
 //! report-builder = "0.1.0"  # Replace with the latest version
 //! ```
 //!
 //! Then, use the provided structs and methods to construct your report:
 //!
-//! ```
+//! ```rust,ignore
 //! use report_builder::{Report, ReportSection};
+//! use maud::html;
 //! use plotly::Plot;
 //!
 //! fn main() {
@@ -405,6 +406,7 @@ impl Report {
 
 mod tests {
     use super::*;
+    use maud::html;
     use crate::plots::plot_scatter;
 
     #[test]

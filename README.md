@@ -26,6 +26,7 @@ Then, use the provided structs and methods to construct your report:
 
 ```
 use report_builder::{Report, ReportSection};
+use maud::html;
 use plotly::Plot;
 
 fn main() {
