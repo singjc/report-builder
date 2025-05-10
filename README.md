@@ -1,6 +1,8 @@
 # Report Builder
 
 --- 
+[![Rust](https://github.com/singjc/report-builder/actions/workflows/rust.yml/badge.svg)](https://github.com/singjc/report-builder/actions/workflows/rust.yml)
+[![Crates.io Version](https://img.shields.io/crates/v/report-builder)](https://crates.io/crates/report-builder)
 
 
 This crate provides tools for generating HTML reports with interactive elements such as tables,
