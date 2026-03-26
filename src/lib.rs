@@ -41,15 +41,13 @@
 //! }
 //! ```
 
-
 pub mod plots;
 
-use std::io::Write;
-use rand::{distributions::Alphanumeric, Rng};
 use chrono::Local;
 use maud::{html, Markup, PreEscaped};
 use plotly::Plot;
-
+use rand::{distributions::Alphanumeric, Rng};
+use std::io::Write;
 
 /// Represents a section of the report, containing a title and multiple content blocks.
 pub struct ReportSection {
@@ -87,10 +85,10 @@ impl ReportSection {
     pub fn add_plot(&mut self, plot: Plot) {
         let plot_id: String = rand::thread_rng()
             .sample_iter(&Alphanumeric)
-            .take(10)  
+            .take(10)
             .map(char::from)
             .collect();
-    
+
         self.content_blocks.push(html! {
             div class="plot-wrapper" {
                 div id=(plot_id.clone()) class="plot-container" {
@@ -111,8 +109,7 @@ impl ReportSection {
                 "#)))
             }
         });
-    } 
-    
+    }
 
     /// Render the section as HTML
     fn render(&self) -> Markup {
@@ -126,8 +123,6 @@ impl ReportSection {
         }
     }
 }
-
-
 
 /// Represents the entire report, containing multiple sections and metadata.
 pub struct Report {
@@ -147,7 +142,12 @@ impl Report {
     /// * `version` - The version of the software.
     /// * `software_logo` - An optional path to the software's logo image.
     /// * `title` - The title of the report.
-    pub fn new(software_name: &str, version: &str, software_logo: Option<&str>, title: &str) -> Self {
+    pub fn new(
+        software_name: &str,
+        version: &str,
+        software_logo: Option<&str>,
+        title: &str,
+    ) -> Self {
         Report {
             software_name: software_name.to_string(),
             version: version.to_string(),
@@ -169,7 +169,7 @@ impl Report {
     /// Render the entire report as HTML
     fn render(&self) -> Markup {
         let current_date = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-    
+
         html! {
             (maud::DOCTYPE)
             html {
@@ -182,7 +182,7 @@ impl Report {
                     script src="https://cdn.datatables.net/colresize/1.0.0/dataTables.colResize.min.js" {}
                     link rel="stylesheet" href="https://cdn.datatables.net/colResize/1.0.0/css/colResize.dataTables.min.css" {}
                     script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" {}
-    
+
                     // JavaScript for DataTables and CSV export
                     script {
                         (PreEscaped(r#"
@@ -221,8 +221,8 @@ impl Report {
                                 });
                             });
                         "#))
-                    }                    
-    
+                    }
+
                     // JavaScript for tabs
                     script {
                         (PreEscaped(r#"
@@ -240,7 +240,7 @@ impl Report {
                             }
                         "#))
                     }
-                    
+
 
                     // CSS styles
                     // CSS for the table container
@@ -355,7 +355,7 @@ impl Report {
                         "))
                     }
                 }
-                
+
                 body {
                     div class="banner" {
                         @if let Some(ref logo) = self.software_logo {
@@ -366,7 +366,7 @@ impl Report {
                             p class="timestamp" { "Generated on: " (current_date) }
                         }
                     }
-                    
+
                     div class="tabs" {
                         @for (i, section) in self.sections.iter().enumerate() {
                             button class="tab" data-tab=(format!("tab{}", i)) onclick=(format!("showTab('tab{}')", i)) {
@@ -374,7 +374,7 @@ impl Report {
                             }
                         }
                     }
-    
+
                     @for (i, section) in self.sections.iter().enumerate() {
                         div id=(format!("tab{}", i)) class={@if i == 0 { "tab-content active" } @else { "tab-content" }} {
                             (section.render())
@@ -384,7 +384,6 @@ impl Report {
             }
         }
     }
-    
 
     /// Saves the report to an HTML file.
     ///
@@ -402,12 +401,18 @@ impl Report {
     }
 }
 
+impl ToString for Report {
+    fn to_string(&self) -> String {
+        self.render().into_string()
+    }
+}
+
 #[cfg(test)]
 
 mod tests {
     use super::*;
-    use maud::html;
     use crate::plots::plot_scatter;
+    use maud::html;
 
     #[test]
     fn test_report() {
@@ -491,7 +496,7 @@ mod tests {
         let y_title = "Y";
 
         let plot = plot_scatter(&x, &y, labels, title, x_title, y_title).unwrap();
-        
+
         let mut section2 = ReportSection::new("Section 2");
         section2.add_plot(plot.clone());
 
@@ -506,8 +511,6 @@ mod tests {
         section2.add_plot(plot);
 
         report.add_section(section2);
-
-        
 
         report.save_to_file("report.html").unwrap();
     }
